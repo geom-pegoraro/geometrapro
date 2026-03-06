@@ -1,0 +1,30 @@
+name: Deploy PWA su GitHub Pages
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Aggiorna versione nel Service Worker
+        run: |
+          VERSION="1.0.${{ github.run_number }}"
+          sed -i "s/VERSION = '[^']*'/VERSION = '${VERSION}'/" sw.js
+          echo "Versione: ${VERSION}"
+
+      - name: Carica su GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy
+        uses: actions/deploy-pages@v4
